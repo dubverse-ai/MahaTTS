@@ -1,3 +1,5 @@
+ref_clips/
+maha_tts/pretrained_models
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
