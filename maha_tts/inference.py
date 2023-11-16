@@ -1,7 +1,8 @@
-import torch,glob,os
+import torch,glob,os,requests
 import numpy as np
 import torch.nn.functional as F
 
+from tqdm import tqdm
 from librosa.filters import mel as librosa_mel_fn
 from scipy.io.wavfile import write
 from scipy.special import softmax
@@ -23,13 +24,50 @@ mel_basis = librosa_mel_fn(
 mel_basis = torch.from_numpy(mel_basis).float()
 
 model_dirs= {
-    'Smolie':'asdf',
-    'hifigan':'asdf'
+    'Smolie':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/S2A/s2a_latest.pt',
+                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/T2S/t2s_best.pt'],
+    'hifigan':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/g_02500000',
+                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/config.json']
 }
 
-def download_model(name):
-    pass
+def download_file(url, filename):
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get('content-length', 0))
 
+    # Check if the response was successful (status code 200)
+    response.raise_for_status()
+
+    with open(filename, 'wb') as file, tqdm(
+        desc=filename,
+        total=total_size,
+        unit='B',
+        unit_scale=True,
+        unit_divisor=1024,
+    ) as bar:
+        for data in response.iter_content(chunk_size=1024):
+            # Write data to the file
+            file.write(data)
+            # Update the progress bar
+            bar.update(len(data))
+
+    print(f"Download complete: {filename}\n")
+
+def download_model(name):
+    print('Downloading ',name," ....")
+    checkpoint_diff = 'maha_tts/pretrained_models/'+name+'/s2a_latest.pt'
+    checkpoint_ts = 'maha_tts/pretrained_models/'+name+'/t2s_best.pt'
+    checkpoint_voco = 'maha_tts/pretrained_models/hifigan/g_02500000'
+    voco_config_path = 'maha_tts/pretrained_models/hifigan/config.json'
+
+    os.makedirs('maha_tts/pretrained_models/'+name,exist_ok=True)
+        
+    if name == 'hifigan':
+        download_file(model_dirs[name][0],checkpoint_voco)
+        download_file(model_dirs[name][1],voco_config_path)
+    
+    else:
+        download_file(model_dirs[name][0],checkpoint_diff)
+        download_file(model_dirs[name][1],checkpoint_ts)
 
 def load_models(name,device=torch.device('cpu')):
     '''
@@ -51,8 +89,8 @@ def load_models(name,device=torch.device('cpu')):
 
     assert name in model_dirs, "no model name "+name
 
-    checkpoint_diff = 'maha_tts/pretrained_models/'+str(name)+'/S2A/s2a_latest.pt'
-    checkpoint_ts = 'maha_tts/pretrained_models/'+str(name)+'/T2S/t2s_best.pt'
+    checkpoint_diff = 'maha_tts/pretrained_models/'+name+'/s2a_latest.pt'
+    checkpoint_ts = 'maha_tts/pretrained_models/'+name+'/t2s_best.pt'
     checkpoint_voco = 'maha_tts/pretrained_models/hifigan/g_02500000'
     voco_config_path = 'maha_tts/pretrained_models/hifigan/config.json'
     

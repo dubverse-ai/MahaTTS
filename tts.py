@@ -5,7 +5,7 @@ from scipy.io.wavfile import write
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('Using:',device)
 text = 'Printing, in the only sense with which we are at present concerned, differs from most if not from all the arts and crafts represented in the Exhibition.'
-ref_clips = glob.glob('/Users/jaskaransingh/Desktop/NeuralSpeak/ref_clips/*.wav')
+ref_clips = glob.glob('ref_clips/*.wav')
 # print(len(ref_clips))
 
 # diffuser = load_diffuser()
