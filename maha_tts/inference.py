@@ -108,9 +108,10 @@ def load_models(name,device=torch.device('cpu')):
 
     return diff_model,ts_model,vocoder,diffuser
 
-def infer_mel(model,timeshape,code,ref_mel,diffuser,temperature=0.1):
+def infer_mel(model,timeshape,code,ref_mel,diffuser,temperature=1.0):
     device = next(model.parameters()).device
     code = code.to(device)
+    ref_mel =ref_mel.to(device)
     output_shape = (1,80,timeshape)
     noise = torch.randn(output_shape, device=code.device) * temperature
     mel = diffuser.p_sample_loop(model, output_shape, noise=noise,
@@ -231,6 +232,7 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
     Example usage:
     audio, sampling_rate = infer_tts("Hello, how are you?", ref_clips, diffuser, diff_model, ts_model, vocoder)
     '''
+    device = next(ts_model.parameters()).device
     text = english_cleaners(text)
     ref_mels = get_ref_mels(ref_clips)
     with torch.no_grad():
@@ -242,7 +244,7 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
                         top_p= 0.8,
                         top_k= 5,
                         n_tot_steps = 1000,
-                        device = None
+                        device = device
                     )
         mel = infer_mel(diff_model,int(((sem_tok.shape[-1] * 320 / 16000) * 22050/256)+1),sem_tok.unsqueeze(0) + 1,
                         ref_mels,diffuser,temperature=1.0)
