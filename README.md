@@ -1,5 +1,7 @@
 # MahaTTS
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1-eOQqznKWwAfMdusJ_LDtDhjIyAlSMrG?usp=sharing)
+
 Some Generated Samples
 
 text->
