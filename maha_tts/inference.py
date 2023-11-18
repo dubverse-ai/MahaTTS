@@ -16,6 +16,8 @@ from maha_tts.text.symbols import labels,text_labels,code_labels,text_enc,text_d
 from maha_tts.text.cleaners import  english_cleaners
 from maha_tts.config import config
 
+DEFAULT_MODELS_DIR = os.path.join(os.path.expanduser('~'), '.cache', 'maha_tts', 'models')
+
 stft_fn = STFT(config.filter_length, config.hop_length, config.win_length)
 
 mel_basis = librosa_mel_fn(
@@ -54,12 +56,12 @@ def download_file(url, filename):
 
 def download_model(name):
     print('Downloading ',name," ....")
-    checkpoint_diff = 'maha_tts/pretrained_models/'+name+'/s2a_latest.pt'
-    checkpoint_ts = 'maha_tts/pretrained_models/'+name+'/t2s_best.pt'
-    checkpoint_voco = 'maha_tts/pretrained_models/hifigan/g_02500000'
-    voco_config_path = 'maha_tts/pretrained_models/hifigan/config.json'
+    checkpoint_diff = os.path.join(DEFAULT_MODELS_DIR,name,'s2a_latest.pt')
+    checkpoint_ts = os.path.join(DEFAULT_MODELS_DIR,name,'t2s_best.pt')
+    checkpoint_voco = os.path.join(DEFAULT_MODELS_DIR,'hifigan','g_02500000')
+    voco_config_path = os.path.join(DEFAULT_MODELS_DIR,'hifigan','config.json')
 
-    os.makedirs('maha_tts/pretrained_models/'+name,exist_ok=True)
+    os.makedirs(os.path.join(DEFAULT_MODELS_DIR,name),exist_ok=True)
         
     if name == 'hifigan':
         download_file(model_dirs[name][0],checkpoint_voco)
@@ -89,10 +91,10 @@ def load_models(name,device=torch.device('cpu')):
 
     assert name in model_dirs, "no model name "+name
 
-    checkpoint_diff = 'maha_tts/pretrained_models/'+name+'/s2a_latest.pt'
-    checkpoint_ts = 'maha_tts/pretrained_models/'+name+'/t2s_best.pt'
-    checkpoint_voco = 'maha_tts/pretrained_models/hifigan/g_02500000'
-    voco_config_path = 'maha_tts/pretrained_models/hifigan/config.json'
+    checkpoint_diff = os.path.join(DEFAULT_MODELS_DIR,name,'s2a_latest.pt')
+    checkpoint_ts = os.path.join(DEFAULT_MODELS_DIR,name,'t2s_best.pt')
+    checkpoint_voco = os.path.join(DEFAULT_MODELS_DIR,'hifigan','g_02500000')
+    voco_config_path = os.path.join(DEFAULT_MODELS_DIR,'hifigan','config.json')
     
     # for i in [checkpoint_diff,checkpoint_ts,checkpoint_voco,voco_config_path]:
     if not os.path.exists(checkpoint_diff) or not os.path.exists(checkpoint_ts):
