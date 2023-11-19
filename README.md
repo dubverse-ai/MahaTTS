@@ -1,5 +1,3 @@
-# MahaTTS
-
 <div align="center">
 
 <h1>MahaTTS: An Open-Source Large Speech Generation Model in the making</h1>
@@ -29,7 +27,7 @@ Trained on 200 hours of LibriTTS model -> 'Smolie'
 pip install git+https://github.com/dubverse-ai/MahaTTS.git
 ```
 
-##Roadmap
+## Roadmap
 - [x] Smolie - eng
 - [ ] Smolie - indic
 - [ ] Optimizations for inference
