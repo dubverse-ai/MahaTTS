@@ -13,6 +13,9 @@ a Dubverse Black initiative <br> <br>
 MahaTTS (Maha means 'Great' in sanskrit), is a speech generation model which is inspired from tortoise-tts, except it uses seamless M4t wav2vec2 to extract semantic tokens.
 Since seamless M4t wav2vec2 is trained on multilingual data, it makes this model easier to scale on multilingual data.
 
+<img width="993" alt="Screenshot 2023-11-19 at 11 53 52 PM" src="https://github.com/dubverse-ai/MahaTTS/assets/32906806/7429d3b6-3f19-4bd8-9005-ff9e16a698f8">
+
+
 ## Features
 1. Multilinguality
 2. Realistic Prosody and intonation
@@ -40,7 +43,7 @@ text:
 
 1 -> "I freakin love how Elon came to life the moment they started talking about gaming and specifically diablo, you can tell that he didn't want that part of the discussion to end, while Lex to move on to the next subject! Once a true gamer, always a true gamer!"
 
-2 -> "hello there! how are you?"
+2 -> "hello there! how are you?" (This one didn't work well, M1 model hallucinated)
 
 3 -> "Who doesn't love a good scary story, something to send a chill across your skin in the middle of summer's heat or really, any other time? And this year, we're celebrating the two hundredth birthday of one of the most famous scary stories of all time: Frankenstein."
 
