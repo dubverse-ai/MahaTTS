@@ -26,6 +26,9 @@ Trained on 200 hours of LibriTTS model -> 'Smolie'
 pip install git+https://github.com/dubverse-ai/MahaTTS.git
 ```
 
+```bash
+pip install maha-tts
+```
 ## Roadmap
 - [x] Smolie - eng
 - [ ] Smolie - indic
