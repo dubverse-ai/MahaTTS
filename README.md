@@ -15,6 +15,13 @@ Since seamless M4t wav2vec2 is trained on multilingual data, it makes this model
 
 <img width="993" alt="Screenshot 2023-11-19 at 11 53 52 PM" src="https://github.com/dubverse-ai/MahaTTS/assets/32906806/7429d3b6-3f19-4bd8-9005-ff9e16a698f8">
 
+### Architecture
+|      Model (Smolie)       | Parameters | Model Type |       Output      |  
+|:-------------------------:|:----------:|------------|:-----------------:|
+|   Text to Semantic (M1)   |    69 M    | Causal LM  |   10,001 Tokens   |
+|  Semantic to MelSpec(M2)  |    108 M   | Diffusion  |   2x 80x Melspec  |
+|      Hifi Gan Vocoder     |    13 M    |    GAN     |   Audio Waveform  |
+
 
 ## Features
 1. Multilinguality
