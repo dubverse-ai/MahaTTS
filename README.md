@@ -28,9 +28,6 @@ Since seamless M4t wav2vec2 is trained on multilingual data, it makes this model
 2. Realistic Prosody and intonation
 3. Multi-voice capabilities
 
-## Current Progress
-Trained on 200 hours of LibriTTS model -> 'Smolie' 
-
 ## Installation
 ```bash
 pip install git+https://github.com/dubverse-ai/MahaTTS.git
@@ -39,10 +36,11 @@ pip install git+https://github.com/dubverse-ai/MahaTTS.git
 ```bash
 pip install maha-tts
 ```
+
 ## Roadmap
-- [x] Smolie - eng
-- [ ] Smolie - indic
-- [ ] Optimizations for inference
+- [x] Smolie - eng (trained on 200 hours of LibriTTS)
+- [ ] Smolie - indic (Train on Indian languages, estimated by 20th Dec)
+- [ ] Optimizations for inference (looking for contributors, check issues)
 
 ## Some Generated Samples
 text:
