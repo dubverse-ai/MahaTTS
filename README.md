@@ -24,7 +24,7 @@ Since seamless M4t wav2vec2 is trained on multilingual data, it makes this model
 
 
 ## Features
-1. Multilinguality
+1. Multilinguality (coming soon)
 2. Realistic Prosody and intonation
 3. Multi-voice capabilities
 
