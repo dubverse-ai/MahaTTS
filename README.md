@@ -114,4 +114,3 @@ MahaTTS is licensed under the Apache 2.0 License.
 - [M4t Seamless](https://github.com/facebookresearch/seamless_communication) [AudioLM](https://arxiv.org/abs/2209.03143) and many other ground-breaking papers that enabled the development of MahaTTS
 - [Diffusion training](https://github.com/openai/guided-diffusion) for training diffusion model
 - [Huggingface](https://huggingface.co/docs/transformers/index) for related training and inference code
-- 
