@@ -82,13 +82,22 @@ write('/content/test.wav',sr,audio)
 
 3 -> "Who doesn't love a good scary story, something to send a chill across your skin in the middle of summer's heat or really, any other time? And this year, we're celebrating the two hundredth birthday of one of the most famous scary stories of all time: Frankenstein."
 
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/66fc7a08-3e8a-4d63-a3fa-88bc705a172a
+https://github.com/dubverse-ai/MahaTTS/assets/32906806/ab6798c7-b749-44e7-93bd-d74fda065b1f
 
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/5acf5a4b-aeb8-4f14-94fe-45811868a886
 
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/0af2ce6e-4172-4aac-9322-4fd545f1d4ac
 
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/2d5b0335-d1fc-473a-aea8-c5bb6afbce27
+https://github.com/dubverse-ai/MahaTTS/assets/32906806/b9e39028-3ecb-48ad-99cd-e6e5822b2406
+
+
+
+
+https://github.com/dubverse-ai/MahaTTS/assets/32906806/ad9c79e1-a206-4be2-aa8f-eda788a10d78
+
+
+
+https://github.com/dubverse-ai/MahaTTS/assets/32906806/10e5925a-b26c-4bda-81c0-450a7906bc8b
+
+
 
 ## Technical Details
 
