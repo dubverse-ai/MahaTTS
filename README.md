@@ -42,8 +42,32 @@ pip install maha-tts
 
 ## api usage
 
-<img width="1251" alt="Screenshot 2023-11-23 at 1 49 45 PM" src="https://github.com/dubverse-ai/MahaTTS/assets/32906806/9992b5a9-1ca7-4e64-9c27-6244e9fd4b15">
+```bash
+!gdown --folder 1-HEc3V4f6X93I8_IfqExLfL3s8I_dXGZ -q # download speakers ref files
 
+import torch,glob
+from maha_tts import load_models,infer_tts
+from scipy.io.wavfile import write
+from IPython.display import Audio,display
+
+# PATH TO THE SPEAKERS WAV FILES
+speaker =['/content/infer_ref_wavs/2272_152282_000019_000001/',
+          '/content/infer_ref_wavs/2971_4275_000049_000000/',
+          '/content/infer_ref_wavs/4807_26852_000062_000000/',
+          '/content/infer_ref_wavs/6518_66470_000014_000002/']
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+diff_model,ts_model,vocoder,diffuser = load_models('Smolie',device)
+print('Using:',device)
+
+speaker_num = 0 # @param ["0", "1", "2", "3"] {type:"raw"}
+text = "I freakin love how Elon came to life the moment they started talking about gaming and specifically diablo, you can tell that he didn't want that part of the discussion to end, while Lex to move on to the next subject! Once a true gamer, always a true gamer!" # @param {type:"string"}
+
+ref_clips = glob.glob(speaker[speaker_num]+'*.wav')
+audio,sr = infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder)
+
+write('/content/test.wav',sr,audio)
+```
 ## Roadmap
 - [x] Smolie - eng (trained on 200 hours of LibriTTS)
 - [ ] Smolie - indic (Train on Indian languages, estimated by 20th Dec)
