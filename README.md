@@ -10,6 +10,7 @@ a <a href = "https://black.dubverse.ai">Dubverse Black</a> initiative <br> <br>
 ------
 
 ## Description
+
 MahaTTS, with Maha signifying 'Great' in Sanskrit, is a Text to Speech Model developed by [Dubverse.ai](https://dubverse.ai). We drew inspiration from the [tortoise-tts](https://github.com/neonbjb/tortoise-tts) model, but our model uniquely utilizes seamless M4t wav2vec2 for semantic token extraction. As this specific variant of wav2vec2 is trained on multilingual data, it enhances our model's scalability across different languages.
 
 We are providing access to pretrained model checkpoints, which are ready for inference and available for commercial use.
@@ -19,15 +20,18 @@ We are providing access to pretrained model checkpoints, which are ready for inf
 ## Updates
 
 **2023-11-13**
+
 - MahaTTS Released! Open sourced Smolie
 - Community and access to new features on our [Discord](https://discord.gg/uFPrzBqyF2)
 
 ## Features
+
 1. Multilinguality (coming soon)
 2. Realistic Prosody and intonation
 3. Multi-voice capabilities
 
 ## Installation
+
 ```bash
 pip install git+https://github.com/dubverse-ai/MahaTTS.git
 ```
@@ -35,6 +39,10 @@ pip install git+https://github.com/dubverse-ai/MahaTTS.git
 ```bash
 pip install maha-tts
 ```
+
+## api usage
+
+<img width="1251" alt="Screenshot 2023-11-23 at 1 49 45 PM" src="https://github.com/dubverse-ai/MahaTTS/assets/32906806/9992b5a9-1ca7-4e64-9c27-6244e9fd4b15">
 
 ## Roadmap
 - [x] Smolie - eng (trained on 200 hours of LibriTTS)
@@ -74,5 +82,12 @@ https://github.com/dubverse-ai/MahaTTS/assets/32906806/2d5b0335-d1fc-473a-aea8-c
 
 ## License
 
-MahaTTS is licensed under the MIT License. 
+MahaTTS is licensed under the Apache 2.0 License. 
 
+## 🙏 Appreciation
+
+- [tortoise-tts](https://github.com/neonbjb/tortoise-tts)
+- [M4t Seamless](https://github.com/facebookresearch/seamless_communication) [AudioLM](https://arxiv.org/abs/2209.03143) and many other ground-breaking papers that enabled the development of MahaTTS
+- [Diffusion training](https://github.com/openai/guided-diffusion) for training diffusion model
+- [Huggingface](https://huggingface.co/docs/transformers/index) for related training and inference code
+- 
