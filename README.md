@@ -70,7 +70,7 @@ write('/content/test.wav',sr,audio)
 ```
 ## Roadmap
 - [x] Smolie - eng (trained on 200 hours of LibriTTS)
-- [ ] Smolie - indic (Train on Indian languages, estimated by 20th Dec)
+- [ ] Smolie - indic (Train on Indian languages, coming soon)
 - [ ] Optimizations for inference (looking for contributors, check issues)
 
 ## Some Generated Samples
