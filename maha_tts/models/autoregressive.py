@@ -20,7 +20,7 @@ def null_position_embeddings(range, dim):
     return torch.zeros((range.shape[0], range.shape[1], dim), device=range.device)
 
 class TS_model(nn.Module):
-    def __init__(self,n_embed = 512, n_layer = 16, n_head = 8):
+    def __init__(self,n_embed = 512, n_layer = 16, n_head = 8, name='Smolie-in'):
         super(TS_model,self).__init__()
 
         self.vocab_size=len(labels)
@@ -28,6 +28,7 @@ class TS_model(nn.Module):
         self.n_embed=n_embed
         self.n_layer=n_layer
         self.n_head=n_head
+        self.name=name
 
         self.config = GPT2Config(vocab_size=self.vocab_size,n_positions=self.n_positions,n_embd=self.n_embed,n_layer=self.n_layer,n_head=self.n_head)
         self.gpt = GPT2Model(self.config)
@@ -44,6 +45,8 @@ class TS_model(nn.Module):
         
         self.text_embed = nn.Embedding(len(text_labels),self.n_embed)
         self.code_embed = nn.Embedding(len(code_labels),self.n_embed)
+        if self.name != 'Smolie-en':
+            self.language_embed = nn.Embedding(len(config.lang_index),self.n_embed)
         self.final_norm = nn.LayerNorm(self.n_embed)
 
     def get_speaker_latent(self, ref_mels):
@@ -59,11 +62,12 @@ class TS_model(nn.Module):
 
         return conds.unsqueeze(1)
 
-    def forward(self,text_ids,codes_ids = None,speaker_embed=None,ref_clips=None,return_loss = False):
+    def forward(self,text_ids,codes_ids = None,speaker_embed=None,ref_clips=None,language=None,return_loss = False):
         assert speaker_embed is not None or ref_clips is not None
         text_embed = self.text_embed(text_ids)
         text_embed += self.text_positional_embed(text_embed)
-
+        if self.name != 'Smolie-en':
+            text_embed += self.language_embed(language).unsqueeze(1)
         code_embed = None
         code_probs= None
 
@@ -118,9 +122,10 @@ class LearnedPositionEmbeddings(nn.Module):
     def get_fixed_embedding(self, ind, dev):
         return self.emb(torch.tensor([ind], device=dev)).unsqueeze(0)
 
-def load_TS_model(checkpoint,device):
-    sem_model= TS_model(n_embed = 512, n_layer = 16, n_head = 8)
-    sem_model.load_state_dict(torch.load(checkpoint,map_location=torch.device('cpu')),strict=False)
+def load_TS_model(checkpoint,device,name):
+    data = torch.load(checkpoint,map_location=torch.device('cpu'))
+    sem_model= TS_model(n_embed = data['n_embed'], n_layer = data['n_layer'], n_head = data['n_head'],name=name)
+    sem_model.load_state_dict(data['state_dict'],strict=True)
     sem_model.eval().to(device)
 
     return sem_model

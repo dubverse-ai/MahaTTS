@@ -17,7 +17,7 @@ from maha_tts.text.cleaners import  english_cleaners
 from maha_tts.config import config
 
 DEFAULT_MODELS_DIR = os.path.join(os.path.expanduser('~'), '.cache', 'maha_tts', 'models')
-
+DEFAULT_MODELS_DIR = '/Users/jaskaransingh/Desktop/MahaTTS/models/'
 stft_fn = STFT(config.filter_length, config.hop_length, config.win_length)
 
 mel_basis = librosa_mel_fn(
@@ -28,6 +28,8 @@ mel_basis = torch.from_numpy(mel_basis).float()
 model_dirs= {
     'Smolie':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/S2A/s2a_latest.pt',
                 'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/T2S/t2s_best.pt'],
+    'Smolie-en':[''],
+    'Smolie-in':[''],
     'hifigan':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/g_02500000',
                 'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/config.json']
 }
@@ -104,7 +106,7 @@ def load_models(name,device=torch.device('cpu')):
         download_model('hifigan')
 
     diff_model = load_diff_model(checkpoint_diff,device)
-    ts_model = load_TS_model(checkpoint_ts,device)
+    ts_model = load_TS_model(checkpoint_ts,device,name)
     vocoder = load_vocoder_model(voco_config_path,checkpoint_voco,device)
     diffuser = load_diffuser()
 
@@ -125,6 +127,7 @@ def generate_semantic_tokens(
     text,
     model,
     ref_mels,
+    language=None,
     temp = 0.7,
     top_p= None,
     top_k= None,
@@ -135,7 +138,7 @@ def generate_semantic_tokens(
     with torch.no_grad():
         for n in range(n_tot_steps):
             x = get_inputs(text,semb,ref_mels,device)
-            _,result = model(**x)
+            _,result = model(**x,language=language)
             relevant_logits = result[0,:,-1]
             if top_p is not None:
                 # faster to convert to numpy
@@ -207,7 +210,7 @@ def get_mel(filepath):
     energy = torch.norm(magnitudes, dim=1).squeeze(0)
     return melspec,list(energy)
 
-def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
+def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder,language=None):
     '''
     Generate audio from the given text using a text-to-speech (TTS) pipeline.
 
@@ -242,6 +245,7 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
                         text,
                         ts_model,
                         ref_mels,
+                        language,
                         temp = 0.7,
                         top_p= 0.8,
                         top_k= 5,
@@ -255,7 +259,7 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
     
     return audio,config.sampling_rate
 
-def load_diffuser(timesteps = 100, gudiance=3):
+def load_diffuser(timesteps = 100, guidance=3):
     '''
     Load and configure a diffuser for denoising and guidance in the diffusion model.
 
@@ -269,10 +273,10 @@ def load_diffuser(timesteps = 100, gudiance=3):
     Description:
     The `load_diffuser` function initializes a diffuser with specific settings for denoising and guidance.
     '''
-    betas = get_named_beta_schedule('cosine',config.sa_timesteps_max)
+    betas = get_named_beta_schedule('linear',config.sa_timesteps_max)
     diffuser = SpacedDiffusion(use_timesteps=space_timesteps(1000, [timesteps]), model_mean_type='epsilon',
                         model_var_type='learned_range', loss_type='rescaled_mse', betas=betas,
-                        conditioning_free=True, conditioning_free_k=gudiance)
+                        conditioning_free=True, conditioning_free_k=guidance)
     diffuser.training=False
     return diffuser
 

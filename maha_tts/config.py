@@ -5,8 +5,9 @@ class config:
     seed_value = 3407
 
     # Text to Semantic
-    t2s_position = 2048
-
+    t2s_position = 4096
+    langs = ['english','tamil', 'telugu', 'punjabi', 'marathi', 'hindi', 'gujarati', 'bengali', 'assamese']
+    lang_index = {i:j for j,i in enumerate(langs)}
     # Semantic to acoustic
     sa_timesteps_max = 1000
 

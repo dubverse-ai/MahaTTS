@@ -6,8 +6,8 @@ from scipy.signal import get_window
 from scipy.io.wavfile import read
 from maha_tts.config import config
 
-TACOTRON_MEL_MAX = 2.3143386840820312
-TACOTRON_MEL_MIN = -11.512925148010254
+TACOTRON_MEL_MAX = 2.4
+TACOTRON_MEL_MIN = -11.5130
 
 
 def denormalize_tacotron_mel(norm_mel):
