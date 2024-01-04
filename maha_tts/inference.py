@@ -12,7 +12,7 @@ from maha_tts.models.vocoder import load_vocoder_model,infer_wav
 from maha_tts.utils.audio import denormalize_tacotron_mel,normalize_tacotron_mel,load_wav_to_torch,dynamic_range_compression
 from maha_tts.utils.stft import STFT
 from maha_tts.utils.diffusion import SpacedDiffusion,get_named_beta_schedule,space_timesteps
-from maha_tts.text.symbols import labels,text_labels,code_labels,text_enc,text_dec,code_enc,code_dec
+from maha_tts.text.symbols import labels,text_labels,text_labels_en,code_labels,text_enc,text_dec,code_enc,code_dec,text_enc_en,text_dec_en
 from maha_tts.text.cleaners import  english_cleaners
 from maha_tts.config import config
 
@@ -130,13 +130,13 @@ def generate_semantic_tokens(
     language=None,
     temp = 0.7,
     top_p= None,
-    top_k= None,
+    top_k= 1,
     n_tot_steps = 1000,
     device = None
     ):
     semb = []
     with torch.no_grad():
-        for n in range(n_tot_steps):
+        for n in tqdm(range(n_tot_steps)):
             x = get_inputs(text,semb,ref_mels,device)
             _,result = model(**x,language=language)
             relevant_logits = result[0,:,-1]
@@ -169,9 +169,13 @@ def generate_semantic_tokens(
     semb = torch.tensor([int(i) for i in semb[:-1]])
     return semb,result
 
-def get_inputs(text,semb=[],ref_mels=[],device=torch.device('cpu')):
+def get_inputs(text,semb=[],ref_mels=[],device=torch.device('cpu'),name = 'Smolie-in'):
   text = text.lower()
-  text_ids=[text_enc['<S>']]+[text_enc[i] for i in text.strip()]+[text_enc['<E>']]
+  if name!='Smolie-en':
+    text_ids=[text_enc_en['<S>']]+[text_enc_en[i] for i in text.strip()]+[text_enc_en['<E>']]
+  else:
+    text_ids=[text_enc['<S>']]+[text_enc[i] for i in text.strip()]+[text_enc['<E>']]
+    
   semb_ids=[code_enc['<SST>']]+[code_enc[i] for i in semb]#+[tok_enc['<EST>']]
 
   input_ids = text_ids+semb_ids
@@ -253,7 +257,7 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder,language=None)
                         device = device
                     )
         mel = infer_mel(diff_model,int(((sem_tok.shape[-1] * 320 / 16000) * 22050/256)+1),sem_tok.unsqueeze(0) + 1,
-                        ref_mels,diffuser,temperature=1.0)
+                        normalize_tacotron_mel(ref_mels),diffuser,temperature=0.5)
 
         audio = infer_wav(mel,vocoder)
     

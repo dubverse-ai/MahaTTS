@@ -13,18 +13,18 @@ from torch.utils.data import Dataset,DataLoader
 from transformers import GPT2Tokenizer,GPT2Config, GPT2Model, GPT2LMHeadModel
 from tqdm import tqdm
 from maha_tts.config import config
-from maha_tts.text.symbols import labels,code_labels,text_labels
+from maha_tts.text.symbols import labels,code_labels,text_labels,text_labels_en
 from maha_tts.models.modules import GST
 
 def null_position_embeddings(range, dim):
     return torch.zeros((range.shape[0], range.shape[1], dim), device=range.device)
 
 class TS_model(nn.Module):
-    def __init__(self,n_embed = 512, n_layer = 16, n_head = 8, name='Smolie-in'):
+    def __init__(self,n_embed = 512, n_layer = 16, n_head = 8, n_positions = 2048, name='Smolie-in'):
         super(TS_model,self).__init__()
 
         self.vocab_size=len(labels)
-        self.n_positions=config.t2s_position
+        self.n_positions=n_positions
         self.n_embed=n_embed
         self.n_layer=n_layer
         self.n_head=n_head
@@ -37,13 +37,19 @@ class TS_model(nn.Module):
         # Built-in token embeddings are unused.
         del self.gpt.wte
         self.GST = GST(model_channels=self.n_embed,num_heads=self.n_head,in_channels=config.n_mel_channels,k=1)
-        self.text_head = nn.Linear(self.n_embed,len(text_labels))
-        self.code_head = nn.Linear(self.n_embed,len(code_labels))
+        if self.name == 'Smolie-en':
+            self.text_head = nn.Linear(self.n_embed,len(text_labels_en))
+        else:
+            self.text_head = nn.Linear(self.n_embed,len(text_labels))
 
+        self.code_head = nn.Linear(self.n_embed,len(code_labels))
         self.text_positional_embed = LearnedPositionEmbeddings(self.n_positions,self.n_embed)
         self.code_positional_embed = LearnedPositionEmbeddings(self.n_positions,self.n_embed)
         
-        self.text_embed = nn.Embedding(len(text_labels),self.n_embed)
+        if self.name == 'Smolie-en':
+            self.text_embed = nn.Embedding(len(text_labels_en),self.n_embed)
+        else:
+            self.text_embed = nn.Embedding(len(text_labels),self.n_embed)
         self.code_embed = nn.Embedding(len(code_labels),self.n_embed)
         if self.name != 'Smolie-en':
             self.language_embed = nn.Embedding(len(config.lang_index),self.n_embed)
@@ -124,7 +130,8 @@ class LearnedPositionEmbeddings(nn.Module):
 
 def load_TS_model(checkpoint,device,name):
     data = torch.load(checkpoint,map_location=torch.device('cpu'))
-    sem_model= TS_model(n_embed = data['n_embed'], n_layer = data['n_layer'], n_head = data['n_head'],name=name)
+    sem_model= TS_model(n_embed = data['n_embed'], n_layer = data['n_layer'], n_head = data['n_head'], n_positions = data['n_positions'],name=name)
+    print(name,data['n_embed'],data['n_layer'],data['n_head'],data['n_positions'])
     sem_model.load_state_dict(data['state_dict'],strict=True)
     sem_model.eval().to(device)
 
