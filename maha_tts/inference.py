@@ -12,7 +12,7 @@ from maha_tts.models.vocoder import load_vocoder_model,infer_wav
 from maha_tts.utils.audio import denormalize_tacotron_mel,normalize_tacotron_mel,load_wav_to_torch,dynamic_range_compression
 from maha_tts.utils.stft import STFT
 from maha_tts.utils.diffusion import SpacedDiffusion,get_named_beta_schedule,space_timesteps
-from maha_tts.text.symbols import labels,text_labels,code_labels,text_enc,text_dec,code_enc,code_dec
+from maha_tts.text.symbols import labels,text_labels,text_labels_en,code_labels,text_enc,text_dec,code_enc,code_dec,text_enc_en,text_dec_en
 from maha_tts.text.cleaners import  english_cleaners
 from maha_tts.config import config
 
@@ -26,8 +26,10 @@ mel_basis = librosa_mel_fn(
 mel_basis = torch.from_numpy(mel_basis).float()
 
 model_dirs= {
-    'Smolie':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie/s2a_latest.pt',
-                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie/t2s_best.pt'],
+    'Smolie-en':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-en/s2a_latest.pt',
+                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-en/t2s_best.pt'],
+    'Smolie-in':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-in/s2a_latest.pt',
+                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-in/t2s_best.pt'],
     'hifigan':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/g_02500000',
                 'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/config.json']
 }
@@ -104,7 +106,7 @@ def load_models(name,device=torch.device('cpu')):
         download_model('hifigan')
 
     diff_model = load_diff_model(checkpoint_diff,device)
-    ts_model = load_TS_model(checkpoint_ts,device)
+    ts_model = load_TS_model(checkpoint_ts,device,name)
     vocoder = load_vocoder_model(voco_config_path,checkpoint_voco,device)
     diffuser = load_diffuser()
 
@@ -125,17 +127,18 @@ def generate_semantic_tokens(
     text,
     model,
     ref_mels,
+    language=None,
     temp = 0.7,
     top_p= None,
-    top_k= None,
+    top_k= 1,
     n_tot_steps = 1000,
     device = None
     ):
     semb = []
     with torch.no_grad():
-        for n in range(n_tot_steps):
-            x = get_inputs(text,semb,ref_mels,device)
-            _,result = model(**x)
+        for n in tqdm(range(n_tot_steps)):
+            x = get_inputs(text,semb,ref_mels,device,model.name)
+            _,result = model(**x,language=language)
             relevant_logits = result[0,:,-1]
             if top_p is not None:
                 # faster to convert to numpy
@@ -166,9 +169,13 @@ def generate_semantic_tokens(
     semb = torch.tensor([int(i) for i in semb[:-1]])
     return semb,result
 
-def get_inputs(text,semb=[],ref_mels=[],device=torch.device('cpu')):
+def get_inputs(text,semb=[],ref_mels=[],device=torch.device('cpu'),name = 'Smolie-in'):
   text = text.lower()
-  text_ids=[text_enc['<S>']]+[text_enc[i] for i in text.strip()]+[text_enc['<E>']]
+  if name=='Smolie-en':
+    text_ids=[text_enc_en['<S>']]+[text_enc_en[i] for i in text.strip()]+[text_enc_en['<E>']]
+  else:
+    text_ids=[text_enc['<S>']]+[text_enc[i] for i in text.strip()]+[text_enc['<E>']]
+    
   semb_ids=[code_enc['<SST>']]+[code_enc[i] for i in semb]#+[tok_enc['<EST>']]
 
   input_ids = text_ids+semb_ids
@@ -207,7 +214,7 @@ def get_mel(filepath):
     energy = torch.norm(magnitudes, dim=1).squeeze(0)
     return melspec,list(energy)
 
-def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
+def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder,language=None):
     '''
     Generate audio from the given text using a text-to-speech (TTS) pipeline.
 
@@ -242,6 +249,7 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
                         text,
                         ts_model,
                         ref_mels,
+                        language,
                         temp = 0.7,
                         top_p= 0.8,
                         top_k= 5,
@@ -249,13 +257,13 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder):
                         device = device
                     )
         mel = infer_mel(diff_model,int(((sem_tok.shape[-1] * 320 / 16000) * 22050/256)+1),sem_tok.unsqueeze(0) + 1,
-                        ref_mels,diffuser,temperature=1.0)
+                        normalize_tacotron_mel(ref_mels),diffuser,temperature=0.5)
 
         audio = infer_wav(mel,vocoder)
     
     return audio,config.sampling_rate
 
-def load_diffuser(timesteps = 100, gudiance=3):
+def load_diffuser(timesteps = 100, guidance=3):
     '''
     Load and configure a diffuser for denoising and guidance in the diffusion model.
 
@@ -269,10 +277,10 @@ def load_diffuser(timesteps = 100, gudiance=3):
     Description:
     The `load_diffuser` function initializes a diffuser with specific settings for denoising and guidance.
     '''
-    betas = get_named_beta_schedule('cosine',config.sa_timesteps_max)
+    betas = get_named_beta_schedule('linear',config.sa_timesteps_max)
     diffuser = SpacedDiffusion(use_timesteps=space_timesteps(1000, [timesteps]), model_mean_type='epsilon',
                         model_var_type='learned_range', loss_type='rescaled_mse', betas=betas,
-                        conditioning_free=True, conditioning_free_k=gudiance)
+                        conditioning_free=True, conditioning_free_k=guidance)
     diffuser.training=False
     return diffuser
 

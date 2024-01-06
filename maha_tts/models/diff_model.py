@@ -117,26 +117,31 @@ class QuartzAttn(TimestepBlock):
         return self.attn(y)
 
 class QuartzNet9x5(nn.Module):
-    def __init__(self,model_channels,num_heads,enable_fp16=False):
+    def __init__(self,model_channels,num_heads,dropout=0.1,enable_fp16=False):
         super(QuartzNet9x5,self).__init__()
         self.enable_fp16 = enable_fp16
 
-        self.conv1=QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=3,dropout=0.1,R=3)
+        self.conv1=QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=3,dropout=dropout,R=3)
         kernels=[5,7,9,13,15,17]
         quartznet=[]
         attn=[]
         for i in kernels:
-            quartznet.append(QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=i,dropout=0.1,R=5,se=True))
+            quartznet.append(QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=i,dropout=dropout,R=5,se=True))
             attn.append(AttentionBlock(model_channels, num_heads, relative_pos_embeddings=True))
+
         kernels=[21,23,25]
-        quartznet.append(QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=21,dropout=0.1,R=5,se=True))
+        quartznet.append(QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=21,dropout=dropout,R=5,se=True))
         attn.append(AttentionBlock(model_channels, num_heads, relative_pos_embeddings=True))
 
         for i in kernels[1:]:
-            quartznet.append(QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=i,dropout=0.1,R=5,se=True))
+            quartznet.append(QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=i,dropout=dropout,R=5,se=True))
             attn.append(AttentionBlock(model_channels, num_heads, relative_pos_embeddings=True))
+        #mask?
+        # quartznet.append(QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=1,dropout=0.1,R=1,separable=False))
+        # self.quartznet2=mySequential(*quartznet2)
         self.quartznet= nn.ModuleList(quartznet)
         self.attn = nn.ModuleList(attn)
+        self.conv2=QuartzNetBlock(model_channels,model_channels,model_channels,kernel_size=3,dropout=dropout,R=3,separable=False)
         self.conv3=nn.Conv1d(model_channels, model_channels, 1, padding='same')
 
 
@@ -146,6 +151,9 @@ class QuartzNet9x5(nn.Module):
         for n,(layer,attn) in enumerate(zip(self.quartznet,self.attn)):
             x = layer(x,time_emb) #256 dim
             x = attn(x)
+            # x = self.quartznet[-1](x,time_emb)
+        
+        x = self.conv2(x.float(),time_emb)
         x = self.conv3(x.float())
         return x
 
@@ -155,10 +163,13 @@ class DiffModel(nn.Module):
         self,
         input_channels=80,
         output_channels=160,
-        model_channels=512,
+        model_channels=256,
         num_heads=8,
-        dropout=0.0,
+        dropout=0.1,
+        num_layers=8,
         multispeaker = True,
+        style_tokens = 100,
+        enable_fp16=False,
         condition_free_per=0.1,
         training = False,
         ar_active = False,
@@ -171,6 +182,8 @@ class DiffModel(nn.Module):
         self.output_channels = output_channels
         self.num_heads = num_heads
         self.dropout = dropout
+        self.num_layers = num_layers
+        self.enable_fp16 = enable_fp16
         self.condition_free_per = condition_free_per
         self.training = training
         self.multispeaker = multispeaker
@@ -179,7 +192,8 @@ class DiffModel(nn.Module):
 
         if not self.ar_active:
             self.code_emb = nn.Embedding(config.semantic_model_centroids+1,model_channels)
-            self.code_converter = mySequential(
+            self.code_converter = mySequential( #maybe add postional embeddings
+                # SCBD(model_channels,model_channels,3,rd=False),
                 AttentionBlock(model_channels, num_heads, relative_pos_embeddings=True),
                 AttentionBlock(model_channels, num_heads, relative_pos_embeddings=True),
                 AttentionBlock(model_channels, num_heads, relative_pos_embeddings=True),
@@ -193,8 +207,7 @@ class DiffModel(nn.Module):
                 AttentionBlock(model_channels, num_heads, relative_pos_embeddings=True),
             )
         if self.multispeaker:
-            self.GST = GST(model_channels,num_heads)
-
+            self.GST = GST(model_channels,num_heads,in_channels=input_channels)
         self.code_norm = normalization(model_channels)
         self.time_norm = normalization(model_channels)
         self.noise_norm = normalization(model_channels)
@@ -208,9 +221,10 @@ class DiffModel(nn.Module):
         
         self.input_block = nn.Conv1d(input_channels,model_channels,3,1,1)
         self.unconditioned_embedding = nn.Parameter(torch.randn(1,model_channels,1))
+        # self.integrating_conv = nn.Conv1d(model_channels*2, model_channels, kernel_size=1)
 
         self.code_time = TimestepEmbedSequential(QuartzAttn(model_channels, dropout, num_heads),QuartzAttn(model_channels, dropout, num_heads),QuartzAttn(model_channels, dropout, num_heads))
-        self.layers = QuartzNet9x5(model_channels,num_heads)
+        self.layers = QuartzNet9x5(model_channels,num_heads,self.enable_fp16,self.dropout)
 
         self.out = nn.Sequential(
             normalization(model_channels),
@@ -232,6 +246,7 @@ class DiffModel(nn.Module):
         return conds.unsqueeze(2)
 
     def forward(self ,x,t,code_emb,ref_clips=None,speaker_latents=None,conditioning_free=False):
+        # print(timestep_embedding(t.unsqueeze(-1),self.model_channels))
         time_embed = self.time_norm(self.time_embed(timestep_embedding(t.unsqueeze(-1),self.model_channels)).permute(0,2,1)).squeeze(2)
         if conditioning_free:
             code_embed = self.unconditioned_embedding.repeat(x.shape[0], 1, x.shape[-1])
@@ -240,6 +255,7 @@ class DiffModel(nn.Module):
                 code_embed = self.code_norm(self.code_converter(self.code_emb(code_emb).permute(0,2,1)))
             else:
                 code_embed = self.code_norm(self.code_converter(code_emb))
+        # print(code_embed.shape)
         if self.multispeaker:
             assert speaker_latents is not None or ref_clips is not None
             if ref_clips is not None:
@@ -262,12 +278,13 @@ class DiffModel(nn.Module):
         out = self.out(x)
         return out
 
+
 def load_diff_model(checkpoint,device,model_channels=512,ar_active=False,len_code_labels=10004):
     diff_model = DiffModel(input_channels=80,
                  output_channels=160,
-                 model_channels=512,
-                 num_heads=8,
-                 dropout=0.15,
+                 model_channels=1024,
+                 num_heads=16,
+                 dropout=0.1,
                  condition_free_per=0.0,
                  multispeaker=True,
                  training=False,
@@ -286,13 +303,13 @@ if __name__ == '__main__':
     diff_model = DiffModel(input_channels=80,
                  output_channels=160,
                  model_channels=1024,
-                 num_heads=8,
+                 num_heads=16,
                  dropout=0.1,
                  num_layers=8,
                  enable_fp16=True,
-                 condition_free_per=0.1,
+                 condition_free_per=0.0,
                  multispeaker=True,
-                 training=True).to(device)
+                 training=False).to(device)
 
     batch_Size = 32
     timeseries = 800
