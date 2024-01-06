@@ -137,7 +137,7 @@ def generate_semantic_tokens(
     semb = []
     with torch.no_grad():
         for n in tqdm(range(n_tot_steps)):
-            x = get_inputs(text,semb,ref_mels,device)
+            x = get_inputs(text,semb,ref_mels,device,model.name)
             _,result = model(**x,language=language)
             relevant_logits = result[0,:,-1]
             if top_p is not None:
@@ -171,7 +171,7 @@ def generate_semantic_tokens(
 
 def get_inputs(text,semb=[],ref_mels=[],device=torch.device('cpu'),name = 'Smolie-in'):
   text = text.lower()
-  if name!='Smolie-en':
+  if name=='Smolie-en':
     text_ids=[text_enc_en['<S>']]+[text_enc_en[i] for i in text.strip()]+[text_enc_en['<E>']]
   else:
     text_ids=[text_enc['<S>']]+[text_enc[i] for i in text.strip()]+[text_enc['<E>']]
