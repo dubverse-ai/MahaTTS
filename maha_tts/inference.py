@@ -17,7 +17,7 @@ from maha_tts.text.cleaners import  english_cleaners
 from maha_tts.config import config
 
 DEFAULT_MODELS_DIR = os.path.join(os.path.expanduser('~'), '.cache', 'maha_tts', 'models')
-DEFAULT_MODELS_DIR = '/Users/jaskaransingh/Desktop/MahaTTS/models/'
+# DEFAULT_MODELS_DIR = '/Users/jaskaransingh/Desktop/MahaTTS/models/'
 stft_fn = STFT(config.filter_length, config.hop_length, config.win_length)
 
 mel_basis = librosa_mel_fn(
@@ -26,10 +26,10 @@ mel_basis = librosa_mel_fn(
 mel_basis = torch.from_numpy(mel_basis).float()
 
 model_dirs= {
-    'Smolie':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/S2A/s2a_latest.pt',
-                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/T2S/t2s_best.pt'],
-    'Smolie-en':[''],
-    'Smolie-in':[''],
+    'Smolie-en':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-en/S2A/s2a_latest.pt',
+                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-en/T2S/t2s_best.pt'],
+    'Smolie-in':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-in/S2A/s2a_latest.pt',
+                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-in/T2S/t2s_best.pt'],
     'hifigan':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/g_02500000',
                 'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/config.json']
 }
