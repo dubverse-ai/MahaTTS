@@ -26,8 +26,8 @@ mel_basis = librosa_mel_fn(
 mel_basis = torch.from_numpy(mel_basis).float()
 
 model_dirs= {
-    'Smolie':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/S2A/s2a_latest.pt',
-                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/smolie/T2S/t2s_best.pt'],
+    'Smolie':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-en/s2a_latest.pt',
+                'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/Smolie-en/t2s_best.pt'],
     'hifigan':['https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/g_02500000',
                 'https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/hifigan/config.json']
 }
