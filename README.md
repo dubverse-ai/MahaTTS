@@ -87,7 +87,8 @@ write('/content/test.wav',sr,audio)
 ```
 ## Roadmap
 - [x] Smolie - eng (trained on 9k hours of Podcast data)
-- [x] Smolie - indic (Train on 9 Indian languages)
+- [x] Smolie - indic (Train on 9 Indian languages, 400 hours of data by IIT madras)
+- [ ] Smolie - indic Scaled (coming soon!)
 - [ ] Optimizations for inference (looking for contributors, check issues)
 
 ## Some Generated Samples
