@@ -46,7 +46,7 @@ pip install maha-tts
 !gdown --folder 1-HEc3V4f6X93I8_IfqExLfL3s8I_dXGZ -q # download speakers ref files
 
 import torch,glob
-from maha_tts import load_models,infer_tts
+from maha_tts import load_models,infer_tts,config
 from scipy.io.wavfile import write
 from IPython.display import Audio,display
 
@@ -56,8 +56,9 @@ speaker =['/content/infer_ref_wavs/2272_152282_000019_000001/',
           '/content/infer_ref_wavs/4807_26852_000062_000000/',
           '/content/infer_ref_wavs/6518_66470_000014_000002/']
 
+#SMOLIE-EN
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-diff_model,ts_model,vocoder,diffuser = load_models('Smolie',device)
+diff_model,ts_model,vocoder,diffuser = load_models('Smolie-en',device)
 print('Using:',device)
 
 speaker_num = 0 # @param ["0", "1", "2", "3"] {type:"raw"}
@@ -67,10 +68,26 @@ ref_clips = glob.glob(speaker[speaker_num]+'*.wav')
 audio,sr = infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder)
 
 write('/content/test.wav',sr,audio)
+
+# SMOLIE-IN
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+diff_model,ts_model,vocoder,diffuser = load_models('Smolie-in',device)
+print('Using:',device)
+
+speaker_num = 0 # @param ["0", "1", "2", "3"] {type:"raw"}
+text = "शाम के समय, आसमान में बिखरी हुई रंग-बिरंगी रौशनी से सजा हुआ नगर दृश्य एक रोमांटिक माहौल बना रहा था।" # @param {type:"string"}
+
+langauge = 'hindi' # ['hindi','english','tamil', 'telugu', 'punjabi', 'marathi', 'gujarati', 'bengali', 'assamese']
+language = torch.tensor(config.lang_index[langauge]).to(device).unsqueeze(0)
+
+ref_clips = glob.glob(speaker[speaker_num]+'*.wav')
+audio,sr = infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder,language)
+
+write('/content/test.wav',sr,audio)
 ```
 ## Roadmap
-- [x] Smolie - eng (trained on 200 hours of LibriTTS)
-- [ ] Smolie - indic (Train on Indian languages, coming soon)
+- [x] Smolie - eng (trained on 9k hours of Podcast data)
+- [x] Smolie - indic (Train on 9 Indian languages)
 - [ ] Optimizations for inference (looking for contributors, check issues)
 
 ## Some Generated Samples
@@ -105,14 +122,23 @@ https://github.com/dubverse-ai/MahaTTS/assets/32906806/15476151-72ea-410d-bcdc-1
 ### Model Params
 |      Model (Smolie)       | Parameters | Model Type |       Output      |  
 |:-------------------------:|:----------:|------------|:-----------------:|
-|   Text to Semantic (M1)   |    69 M    | Causal LM  |   10,001 Tokens   |
-|  Semantic to MelSpec(M2)  |    108 M   | Diffusion  |   2x 80x Melspec  |
+|   Text to Semantic (M1)   |    84 M    | Causal LM  |   10,001 Tokens   |
+|  Semantic to MelSpec(M2)  |    430 M   | Diffusion  |   2x 80x Melspec  |
 |      Hifi Gan Vocoder     |    13 M    |    GAN     |   Audio Waveform  |
 
 ### Languages Supported
 | Language | Status |
 | --- | :---: |
 | English (en) | ✅ |
+| Hindi (in) | ✅ |
+| Indian English (in) | ✅ |
+| Bengali (in) | ✅ |
+| Tamil (in) | ✅ |
+| Telugu (in) | ✅ |
+| Punjabi (in) | ✅ |
+| Marathi (in) | ✅ |
+| Gujarati (in) | ✅ |
+| Assamese (in) | ✅ |
 
 ## License
 
