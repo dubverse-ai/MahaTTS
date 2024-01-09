@@ -19,10 +19,14 @@ We are providing access to pretrained model checkpoints, which are ready for inf
 
 ## Updates
 
-**2023-11-13**
+**13-11-2023**
 
 - MahaTTS Released! Open sourced Smolie
 - Community and access to new features on our [Discord](https://discord.gg/uFPrzBqyF2)
+
+**7-01-2024**
+
+- Smolie-en and Smolie-in released!
 
 ## Features
 
