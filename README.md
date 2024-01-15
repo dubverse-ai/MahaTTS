@@ -1,9 +1,10 @@
 <div align="center">
 
-<h1>MahaTTS: An Open-Source Large Speech Generation Model in the making</h1>
+<a href="https://ibb.co/wN1LS7K"><img src="https://i.ibb.co/TB5T41H/Screenshot-2024-01-15-at-8-14-08-PM.png" alt="MahaTTS by Dubverse.ai" border="0" width=250></a>
+<h1>MahaTTS: An Open-Source Large Speech Generation Model</h1>
 a <a href = "https://black.dubverse.ai">Dubverse Black</a> initiative <br> <br>
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1-eOQqznKWwAfMdusJ_LDtDhjIyAlSMrG?usp=sharing)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qkZz2km-PX75P0f6mUb2y5e-uzub27NW?usp=sharing)
 [![Discord Shield](https://discordapp.com/api/guilds/1162007551987171410/widget.png?style=shield)](https://discord.gg/4VGnrgpBN)
 </div>
 
@@ -104,31 +105,8 @@ write('/content/test.wav',sr,audio)
 - [ ] Smolie Indic Scaled (coming soon!)
 - [ ] Optimizations for inference (looking for contributors, check issues)
 
-## Some Generated Samples
-0 -> "I seriously laughed so much hahahaha (seals with headphones...) and appreciate both the interviewer and the subject. Major respect for two extraordinary humans - and in this time of gratefulness, I'm thankful for you both and this forum!"
-
-1 -> "I freakin love how Elon came to life the moment they started talking about gaming and specifically diablo, you can tell that he didn't want that part of the discussion to end, while Lex to move on to the next subject! Once a true gamer, always a true gamer!"
-
-2 -> "hello there! how are you?" (This one didn't work well, M1 model hallucinated)
-
-3 -> "Who doesn't love a good scary story, something to send a chill across your skin in the middle of summer's heat or really, any other time? And this year, we're celebrating the two hundredth birthday of one of the most famous scary stories of all time: Frankenstein."
-
-
-
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/462ee134-5d8c-43c8-a425-3b6cabd2ff85
-
-
-
-
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/40c62402-7f65-4a35-b739-d8b8a082ad62
-
-
-
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/f0a9628c-ef81-450d-ab82-2f4c4626864e
-
-
-
-https://github.com/dubverse-ai/MahaTTS/assets/32906806/15476151-72ea-410d-bcdc-177433df7884
+## Sample Outputs
+https://github.com/dubverse-ai/MahaTTS/assets/33093945/e6bde707-1e75-455f-b54d-fb1791c2afbf
 
 
 ## Technical Details
