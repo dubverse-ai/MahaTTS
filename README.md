@@ -20,23 +20,28 @@ MahaTTS, with Maha signifying 'Great' in Sanskrit, is a Text to Speech Model dev
 
 We are providing access to pretrained model checkpoints, which are ready for inference and available for commercial use.
 
+### Capabilities
+Within a single model,
+- generate voices in multiple seen and unseen speaker identities (voice cloning)
+- generate voices in multiple langauges (multilingual and cross-lingual voice cloning)
+- copy the style of speech from one speaker to another (cross-lingual voice cloning with prosody and intonation transfer)
+
+### MahaTTS Architecture
+
 <img width="993" alt="MahaTTS Architecture" src="https://github.com/dubverse-ai/MahaTTS/assets/32906806/7429d3b6-3f19-4bd8-9005-ff9e16a698f8">
 
+
+
 ## Updates
-
-**13-11-2023**
-
-- MahaTTS Open Sourced!
 
 **7-01-2024**
 
 - Smolie English (`smolie-en`) and Smolie Indic (`smolie-in`) released!
 
-## Features
+**13-11-2023**
 
-1. Multilinguality (coming soon)
-2. Realistic Prosody and intonation
-3. Multi-voice capabilities
+- MahaTTS Open Sourced!
+
 
 ## Installation
 
@@ -51,7 +56,8 @@ pip install maha-tts
 ## api usage
 
 ```bash
-!gdown --folder 1-HEc3V4f6X93I8_IfqExLfL3s8I_dXGZ -q #download speakers ref files
+#download example speakers ref files to copy the prosody from
+!gdown --folder 1-HEc3V4f6X93I8_IfqExLfL3s8I_dXGZ -q 
 
 import torch, glob
 from maha_tts import load_models,infer_tts,config
@@ -101,8 +107,8 @@ write('/content/test.wav',sr,audio)
 
 ## Roadmap
 - [x] Smolie English (`smolie-en`): Trained on 9k hours of English Podcast data
-- [x] Smolie Indic (`smolie-in`): Trained on 400 hour of IIT Madras audio data across 9 Indian languages
-- [ ] Smolie Indic Scaled (coming soon!)
+- [x] Smolie Indic (`smolie-in`): Trained on 400 hour of IIT Madras TTS audio data across 9 Indian languages
+- [ ] Smolie Indic + English: Trained on big data (coming soon!)
 - [ ] Optimizations for inference (looking for contributors, check issues)
 
 ## Sample Outputs
