@@ -250,14 +250,14 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder,language=None)
                         ts_model,
                         ref_mels,
                         language,
-                        temp = 0.7,
+                        temp = 0.5,
                         top_p= 0.8,
-                        top_k= 5,
+                        top_k= 3,
                         n_tot_steps = 1000,
                         device = device
                     )
         mel = infer_mel(diff_model,int(((sem_tok.shape[-1] * 320 / 16000) * 22050/256)+1),sem_tok.unsqueeze(0) + 1,
-                        normalize_tacotron_mel(ref_mels),diffuser,temperature=0.5)
+                        normalize_tacotron_mel(ref_mels),diffuser,temperature=0.4)
 
         audio = infer_wav(mel,vocoder)
     
