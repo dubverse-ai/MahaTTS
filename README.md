@@ -57,7 +57,8 @@ pip install maha-tts
 
 ```bash
 #download example speakers ref files to copy the prosody from
-!gdown --folder 1-HEc3V4f6X93I8_IfqExLfL3s8I_dXGZ -q 
+!wget https://huggingface.co/Dubverse/MahaTTS/resolve/main/maha_tts/pretrained_models/infer_ref_wavs.zip
+!unzip ./infer_ref_wavs.zip
 
 import torch, glob
 from maha_tts import load_models,infer_tts,config
