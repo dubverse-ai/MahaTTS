@@ -250,9 +250,9 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder,language=None)
                         ts_model,
                         ref_mels,
                         language,
-                        temp = 0.7,
+                        temp = 0.8,
                         top_p= 0.8,
-                        top_k= 5,
+                        top_k= 50,
                         n_tot_steps = 1000,
                         device = device
                     )
