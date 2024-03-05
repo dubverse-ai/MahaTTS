@@ -5,14 +5,12 @@
 a <a href = "https://black.dubverse.ai">Dubverse Black</a> initiative <br> <br>
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qkZz2km-PX75P0f6mUb2y5e-uzub27NW?usp=sharing)
-[![Discord Shield](https://discordapp.com/api/guilds/1162007551987171410/widget.png?style=shield)](https://discord.gg/4VGnrgpBN)
 </div>
 
 ------
+## Next Up
 
-## Community
-
-Join our [Discord Community](https://discord.gg/4VGnrgpBN) and select the role `Github Guru` to get early access to upcoming model releases. We have two major model releases planned before March 2024.  
+We are currently training our large scale model. This will be a 1B parameter model, trained on 20K hours of data in 15 languages with 10 Indic Languages.
 
 ## Description
 
