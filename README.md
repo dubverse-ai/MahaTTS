@@ -10,7 +10,7 @@ a <a href = "https://black.dubverse.ai">Dubverse Black</a> initiative <br> <br>
 ------
 ## Next Up
 
-We are currently training our large scale model. This will be a 1B parameter model, trained on 20K hours of data in 15 languages with 10 Indic Languages.
+We are currently training our large scale model. This will be a 1B parameter model, trained on 20K hours of data in 15 languages with 10 Indic Languages. This will be out by Mid March 2024, provided our GPUs don't decide to go supernova on us. Evaluations to take a week more. But hey, good science takes time, right?
 
 ## Description
 
