@@ -241,6 +241,7 @@ def infer_tts(text,ref_clips,diffuser,diff_model,ts_model,vocoder,language=None)
     Example usage:
     audio, sampling_rate = infer_tts("Hello, how are you?", ref_clips, diffuser, diff_model, ts_model, vocoder)
     '''
+    assert(len(ref_clips) > 0)
     device = next(ts_model.parameters()).device
     text = english_cleaners(text)
     ref_mels = get_ref_mels(ref_clips)
